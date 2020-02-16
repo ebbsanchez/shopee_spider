@@ -1,0 +1,10 @@
+.abandoned {
+	/*display: none;*/
+	background-color: #FFCEDF;
+}
+.following {
+	background-color: #FFEBCE;
+}
+.updated {
+	background-color: #CEFFD1;
+}

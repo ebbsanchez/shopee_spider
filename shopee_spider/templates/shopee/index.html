@@ -1,0 +1,29 @@
+{% extends "shopee/base.html" %}
+{% block head_css %}
+	{% load static %}
+	<link rel="stylesheet" href="{% static "shopee/main.css" %}">
+{% endblock head_css %}
+{% block content %}
+	?? {{ items_counts }} items in DB
+	<ul>
+	{% for item in items %}
+		{% if not item.abandoned %}
+		<li class="{% if item.abandoned %}abandoned{% endif %} {% if item.following %} following{% endif %} {% if item.updated %}updated{% endif %}">
+			<div>
+				{{ item.name }}	<br>
+				{{ item.price }}/
+				<a href="{% url 'shopee_spider:abandoned' item.id %}">aban:{{ item.abandoned }}</a> /
+				/<a href="{% url 'shopee_spider:following' item.id %}">folo:{{ item.following }}</a> /
+				Upd: {{item.updated}}
+			</div>
+		</li>
+		<br>
+		{% endif %}
+	{% endfor %}
+	</ul>
+
+	<form action="" method="POST">
+		{% csrf_token %}
+		<input type="submit" >
+	</form>
+{% endblock content %}
