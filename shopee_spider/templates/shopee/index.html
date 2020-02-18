@@ -4,13 +4,36 @@
 	<link rel="stylesheet" href="{% static "shopee/main.css" %}">
 {% endblock head_css %}
 {% block content %}
+	<form action="" method="POST">
+		{% csrf_token %}
+		<input class="btn" type="submit" >
+	</form>
+	<h1>new_items</h1>
+	<ol>
+	{% for item in new_items %}
+		{# {% if not item.abandoned %} #}
+		<li class="">
+			<div>
+				<img class="item-image" src="https://cf.shopee.tw/file/{{ item.image }}" alt="item image"><br>
+				{ item.name }}
+				<br>
+				{{ item.price }}
+			</div>
+		</li>
+		<br>
+		{# {% endif %} #}
+	{% endfor %}
+	</ol>
+	<br>
+
 	?? {{ items_counts }} items in DB
-	<ul>
+	<ol>
 	{% for item in items %}
-		{% if not item.abandoned %}
+		{# {% if not item.abandoned %} #}
 		<li class="{% if item.abandoned %}abandoned{% endif %} {% if item.following %} following{% endif %} {% if item.updated %}updated{% endif %}">
 			<div>
-				{{ item.name }}	<br>
+				<img class="item-image" src="https://cf.shopee.tw/file/{{ item.image }}" alt="item image"><br>
+				<a href="{{item.url}}">{{ item.name }}</a><br>
 				{{ item.price }}/
 				<a href="{% url 'shopee_spider:abandoned' item.id %}">aban:{{ item.abandoned }}</a> /
 				/<a href="{% url 'shopee_spider:following' item.id %}">folo:{{ item.following }}</a> /
@@ -18,12 +41,10 @@
 			</div>
 		</li>
 		<br>
-		{% endif %}
+		{# {% endif %} #}
 	{% endfor %}
-	</ul>
+	</ol>
 
-	<form action="" method="POST">
-		{% csrf_token %}
-		<input type="submit" >
-	</form>
+	
+	
 {% endblock content %}

@@ -8,43 +8,49 @@ from .scripts import shopee
 
 
 def index(request):
-
+    none_price_count = 0
+    Item.objects.all().update(updated=False)
+    all_new_items = [];
     if request.method == "POST":
         new_items = shopee.getitems()
+        all_new_items += new_items
         Item.objects.all().update(updated=False)
         for new_item in new_items:
             item, created = Item.objects.get_or_create(
                 itemid=new_item['itemid'])
             if new_item['price'] == None:
-                print("[*] Get price None.. skipping")
+                none_price_count += 1
                 continue
             elif created:
+                item.shopid = new_item['shopid']
                 item.name = new_item['name']
                 item.item_status = new_item['item_status']
                 item.image = new_item['image']
                 item.images = new_item['images']
-                item.price = new_item['price']
+                item.price = new_item['price'] / 10000
                 item.price_min = new_item['price_min']
                 item.price_max = new_item['price_max']
                 item.currency = new_item['currency']
                 item.abandoned = False
                 item.updated = True
             elif not created and (  # something_changed()
+                    item.shopid != new_item['shopid'] or
                     item.name != new_item['name'] or
                     item.item_status != new_item['item_status'] or
                     item.image != new_item['image'] or
                     item.images != new_item['images'] or
-                    item.price != new_item['price'] or
+                    item.price != new_item['price']/10000 or
                     item.price_min != new_item['price_min'] or
                     item.price_max != new_item['price_max'] or
                     item.currency != new_item['currency']):
                 item.abandoned = False
                 item.updated = True
+                item.shopid = new_item['shopid']
                 item.name = new_item['name']
                 item.item_status = new_item['item_status']
                 item.image = new_item['image']
                 item.images = new_item['images']
-                item.price = new_item['price']
+                item.price = new_item['price']/10000
                 item.price_min = new_item['price_min']
                 item.price_max = new_item['price_max']
                 item.currency = new_item['currency']
@@ -52,12 +58,23 @@ def index(request):
                 pass
 
             item.save()
-            return HttpResponseRedirect(reverse('shopee_spider:index'))
+        print("[*] Get {} None price".format(str(none_price_count)))
+        return HttpResponseRedirect(reverse('shopee_spider:index'))
+    
+
     items = Item.objects.all()
+    
     context = {
         'items': items,
         'items_counts': len(items)
     }
+
+    if all_new_items != None:
+        for item in all_new_items:
+            if item['price'] != None:
+                item['price'] /= 100000
+        context['new_items'] = all_new_items
+
     return render(request, 'shopee/index.html', context)
 
 
@@ -73,3 +90,12 @@ def item_following(request, item_id):
     item.following = True
     item.save()
     return HttpResponseRedirect(reverse('shopee_spider:index'))
+
+
+def following_list(request):
+    return
+
+def abandoned_list(request):
+    return
+    
+

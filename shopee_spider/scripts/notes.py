@@ -1,36 +1,93 @@
+"{}/{}-{}.{}.{}".format('https://shopee.tw',new_items[0]['name'].replace(' ','-'),'i',new_items[0]['shopid'], new_items[0]['itemid'])
 
-def testlen(keyword,s):
-    biggest = 0
-    for item in s.items:
-        title_len = len(str(item[keyword]))
-        if title_len > biggest:
-            biggest=title_len
-            bname=item[keyword]
-    print('format: {}'.format(type(s.items[0][keyword])))
-    print("""item[{keyword}] max_length = {max_length}
-{keyword}: {name}""".format(keyword=keyword, max_length=biggest, name=bname))
+SHELL:
+item.url = "{}/{}-{}.{}.{}".format('https://shopee.tw',item.name.replace(' ','-'),'i',item.shopid, item.itemid)
+
+* "Accept", "application/json"
+
+* 可以撈JSON+LD
+<script type="application/ld+json">
+    { 
+   "@context":"http://schema.org",
+   "@type":"Product",
+   "name":"【eYe攝影】現貨 馬歇爾 Marshall Stockwell II 二代 可攜式 藍牙音響 無線喇叭 藍芽音箱 手提",
+   "description":"",
+   "url":"https://shopee.tw/【eYe攝影】現貨-馬歇爾-Marshall-Stockwell-II-二代-可攜式-藍牙音響-無線喇叭-藍芽音箱-手提-i.2739654.2800358164",
+   "productID":"2800358164",
+   "image":"https://cf.shopee.tw/file/abffb596b0acf0de92865611b615acd9",
+   "brand":"Marshall 馬歇爾",
+   "offers":{ 
+      "@type":"AggregateOffer",
+      "lowPrice":"7990.00",
+      "highPrice":"8500.00",
+      "priceCurrency":"TWD",
+      "availability":"http://schema.org/InStock"
+   },
+   "aggregateRating":{ 
+      "@type":"AggregateRating",
+      "bestRating":5,
+      "worstRating":1,
+      "ratingCount":"6",
+      "ratingValue":"4.83"
+   }
+}
+</script>
+<script>
+function showBody() {
+    document && document.body && (document.body.style.visibility = "visible")
+}
+var SHORT_URL_MAX_LENGTH = 256,
+    pathname = location && location.pathname;
+if ("/" !== pathname && pathname.length < SHORT_URL_MAX_LENGTH && "" === location.hash && -1 === pathname.indexOf("-") && 0 === pathname.lastIndexOf("/")) {
+    document && document.body && (document.body.style.visibility = "hidden"), setTimeout(showBody, 5e3);
+    var xhr = new XMLHttpRequest;
+    xhr.open("GET", "/api/v0/is_short_url/?path=" + pathname.replace("/", "")), xhr.setRequestHeader("Content-Type", "application/json"), xhr.setRequestHeader("Accept", "application/json"), xhr.onreadystatechange = function() {
+        if (4 === this.readyState)
+            if (200 === this.status)
+                if (JSON.parse(this.responseText).error) showBody();
+                else {
+                    var e = document.createElement("a");
+                    e.href = location.href, e.search += "?" === e.search[0] ? "&__classic__=1" : "?__classic__=1", location.href = e.href
+                }
+        else showBody()
+    }, xhr.send()
+}
+</script>
 
 
-def r(nameOfModule):
-    import importlib
-    importlib.reload(nameOfModule)
 
-:authority: shopee.tw
-:method: GET
-:path: /api/v2/search_items/?by=relevancy&keyword=marshall%20stockwell&limit=50&newest=0&order=desc&page_type=search&version=2
-:scheme: https
+# def testlen(keyword,s):
+#     biggest = 0
+#     for item in s.items:
+#         title_len = len(str(item[keyword]))
+#         if title_len > biggest:
+#             biggest=title_len
+#             bname=item[keyword]
+#     print('format: {}'.format(type(s.items[0][keyword])))
+#     print("""item[{keyword}] max_length = {max_length}
+# {keyword}: {name}""".format(keyword=keyword, max_length=biggest, name=bname))
+
+
+# def r(nameOfModule):
+#     import importlib
+#     importlib.reload(nameOfModule)
+
+# :authority: shopee.tw
+# :method: GET
+# :path: /api/v2/search_items/?by=relevancy&keyword=marshall%20stockwell&limit=50&newest=0&order=desc&page_type=search&version=2
+# :scheme: https
 # accept: */*
 # accept-encoding: gzip, deflate, br
 # accept-language: zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7,zh-CN;q=0.6
 # cookie: _gcl_au=1.1.2098345466.1581707635; _med=refer; csrftoken=oMs1RLrqT8FlYliqyOyn860UYB2244kX; __BWfp=c1581707636071x709c604a3; SPC_IA=-1; SPC_EC=-; SPC_U=-; REC_T_ID=2560c43c-4f5e-11ea-be85-d094668e4ae3; SPC_F=dvDwxMitnpbVXIBW3QN9P76h7T0JOuU9; REC_T_ID=256f68e6-4f5e-11ea-b272-b4969130c480; SPC_SI=tirs2imqpt8xwfw4yjws9c3bvk5drbc6; _ga=GA1.2.500498420.1581707637; _gid=GA1.2.1868143270.1581707637; language=zhHant; SPC_R_T_ID="x93tuSqAwzZN+Sq7dMzsKI7SSSOC+7t1OhyRThEsAsUj6kdG1db0P9WmrvLCc8pdzDlBy/B0Ztnsag879GpMsJD/uw605eQe5apinM5KgFw="; SPC_T_IV="0t8Yv2q0adXaFHTU73KVbw=="; SPC_R_T_IV="0t8Yv2q0adXaFHTU73KVbw=="; SPC_T_ID="x93tuSqAwzZN+Sq7dMzsKI7SSSOC+7t1OhyRThEsAsUj6kdG1db0P9WmrvLCc8pdzDlBy/B0Ztnsag879GpMsJD/uw605eQe5apinM5KgFw="
 # if-none-match-: 55b03-ef0ab7fbbf9e315b43ebfee7ed98cf45
-referer: https://shopee.tw/search?keyword=marshall%20stockwell&page=0
-sec-fetch-dest: empty
-sec-fetch-mode: cors
-sec-fetch-site: same-origin
-user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.106 Safari/537.36
-x-api-source: pc
-x-requested-with: XMLHttpRequest
+# referer: https://shopee.tw/search?keyword=marshall%20stockwell&page=0
+# sec-fetch-dest: empty
+# sec-fetch-mode: cors
+# sec-fetch-site: same-origin
+# user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.106 Safari/537.36
+# x-api-source: pc
+# x-requested-with: XMLHttpRequest
 
 
 # attr=[
