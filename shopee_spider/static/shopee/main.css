@@ -1,9 +1,11 @@
+/* variable */
+
 .abandoned {
 	/*display: none;*/
-	background-color: #FFCEDF;
+	background-color: #ffebee;
 }
 .following {
-	background-color: #FFEBCE;
+	background-color: #f1f8e9 ;
 }
 .updated {
 	background-color: #CEFFD1;
@@ -13,7 +15,33 @@ img.item-image {
 	width: 15em;
 	height:auto;
 }
-.btn {
-	width: 10em;
-	height:10em;
+
+.card.overwrite {
+	height: 45em;
+}
+
+.card-title.overwrite {
+	font-size: 1.4em;
+}
+
+.truncate {
+	max-height: 10em;
+	/*-webkit-line-clamp: 4;*/
+}
+
+.price {
+	font-size: 1.9em;
+	/*color: #ff6d00;*/
+
+}
+
+.actions {
+	padding: 1em;
+	text-align: center;
+}
+
+@media only screen and (min-width: 993px){
+	.container.overwrite {
+    	width: 90%;
+	}	
 }

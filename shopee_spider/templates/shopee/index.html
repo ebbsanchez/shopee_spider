@@ -1,50 +1,115 @@
 {% extends "shopee/base.html" %}
 {% block head_css %}
 	{% load static %}
+	{{ block.super }}
 	<link rel="stylesheet" href="{% static "shopee/main.css" %}">
 {% endblock head_css %}
 {% block content %}
-	<form action="" method="POST">
-		{% csrf_token %}
-		<input class="btn" type="submit" >
-	</form>
-	<h1>new_items</h1>
-	<ol>
-	{% for item in new_items %}
-		{# {% if not item.abandoned %} #}
-		<li class="">
-			<div>
-				<img class="item-image" src="https://cf.shopee.tw/file/{{ item.image }}" alt="item image"><br>
-				{ item.name }}
-				<br>
-				{{ item.price }}
-			</div>
-		</li>
+	<div class="actions">
+		<form action="" method="POST">
+			{% csrf_token %}
+			<input class="btn yellow lighten-3 black-text" type="submit" value="搜尋 Marshall 資料">	
+		</form>
+		<button class="trigger-action btn">Trigger Action</button>
+	</div>
+	<div class="container overwrite">
+		<h1>new_items</h1>
+		<ol>
+			{% for item in new_items %}
+				{# {% if not item.abandoned %} #}
+					<li class="">
+						<div>
+							<img class="item-image" src="https://cf.shopee.tw/file/{{ item.image }}" alt="item image"><br>
+							{ item.name }}
+							<br>
+							{{ item.price }}
+						</div>
+					</li>
+					<br>
+				{# {% endif %} #}
+			{% endfor %}
+		</ol>
 		<br>
-		{# {% endif %} #}
-	{% endfor %}
-	</ol>
-	<br>
+		{{ items_counts }} items in DB
+		{# Cards #}
+		<div class="row">
+			{% for item in items %}
+				{% if not item.abandoned %}
+					<div class="col s12 m4">
+						<div class="card overwrite {% if item.abandoned %}abandoned{% endif %} {% if item.following %} following{% endif %} {% if item.updated %}updated{% endif %}">
+						<div class="card-image">
+							<img src="https://cf.shopee.tw/file/{{ item.image }}" alt="">
+							
+						</div>
+						<div class="card-content">
+							<span class="card-title overwrite">
+								<a  class="not_truncate" href="{{item.url}}">
+									{{ item.name }}
+								</a>
+							</span>
+							<p id="item-{{item.id}}" class="price">{{ item.price }}</p>
+						</div>
+						<div class="card-action">
+							<a href="{% url 'shopee_spider:abandoned' item.id %}">
+								{% if item.abandoned %}
+									On list
+								{% else %}
+									Trash
+								{% endif %}
+							</a>
+							<br>
+							<a href="{% url 'shopee_spider:following' item.id %}">
+								{% if item.following %}
+									Following
+								{% else %}
+									Or not
+								{% endif %}
+							</a>
+							<br>
+							Upd: {{item.updated}}
+						</div>
+					</div>
+				</div>
+			{% endif %}
+		{% endfor %}
+	</div>
+</div>
 
-	?? {{ items_counts }} items in DB
-	<ol>
-	{% for item in items %}
-		{# {% if not item.abandoned %} #}
-		<li class="{% if item.abandoned %}abandoned{% endif %} {% if item.following %} following{% endif %} {% if item.updated %}updated{% endif %}">
-			<div>
-				<img class="item-image" src="https://cf.shopee.tw/file/{{ item.image }}" alt="item image"><br>
-				<a href="{{item.url}}">{{ item.name }}</a><br>
-				{{ item.price }}/
-				<a href="{% url 'shopee_spider:abandoned' item.id %}">aban:{{ item.abandoned }}</a> /
-				/<a href="{% url 'shopee_spider:following' item.id %}">folo:{{ item.following }}</a> /
-				Upd: {{item.updated}}
-			</div>
-		</li>
-		<br>
-		{# {% endif %} #}
-	{% endfor %}
-	</ol>
 
+<script>
 	
-	
+
+	$(document).ready(function(){
+		$(".price").click(function(){
+			$(this).css("background-color", "rgb(255, 255, 0)");
+		});
+
+    	$(".trigger-action").click(function(){
+			var ids = []; // idsString;
+			$(".price").each( function() {
+				if ($(this).css("background-color") == "rgb(255, 255, 0)") {
+					ids.push(this.id);
+				}
+			});	
+			console.log("Tagged=" , ids);
+			// idsString = ids.join('&');
+			// $("#page").get("ajax_file.php?" + idsString);
+ 		});
+	});
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 {% endblock content %}

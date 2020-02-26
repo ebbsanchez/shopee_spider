@@ -27,7 +27,7 @@ def index(request):
                 item.item_status = new_item['item_status']
                 item.image = new_item['image']
                 item.images = new_item['images']
-                item.price = new_item['price'] / 10000
+                item.price = new_item['price'] / 100000
                 item.price_min = new_item['price_min']
                 item.price_max = new_item['price_max']
                 item.currency = new_item['currency']
@@ -39,7 +39,7 @@ def index(request):
                     item.item_status != new_item['item_status'] or
                     item.image != new_item['image'] or
                     item.images != new_item['images'] or
-                    item.price != new_item['price']/10000 or
+                    item.price != new_item['price']/100000 or
                     item.price_min != new_item['price_min'] or
                     item.price_max != new_item['price_max'] or
                     item.currency != new_item['currency']):
@@ -50,7 +50,7 @@ def index(request):
                 item.item_status = new_item['item_status']
                 item.image = new_item['image']
                 item.images = new_item['images']
-                item.price = new_item['price']/10000
+                item.price = new_item['price']/100000
                 item.price_min = new_item['price_min']
                 item.price_max = new_item['price_max']
                 item.currency = new_item['currency']
@@ -70,9 +70,6 @@ def index(request):
     }
 
     if all_new_items != None:
-        for item in all_new_items:
-            if item['price'] != None:
-                item['price'] /= 100000
         context['new_items'] = all_new_items
 
     return render(request, 'shopee/index.html', context)
