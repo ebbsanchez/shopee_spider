@@ -10,7 +10,7 @@ from .scripts import shopee
 def index(request):
     none_price_count = 0
     Item.objects.all().update(updated=False)
-    all_new_items = [];
+    all_new_items = []
     if request.method == "POST":
         new_items = shopee.getitems()
         all_new_items += new_items
@@ -60,10 +60,9 @@ def index(request):
             item.save()
         print("[*] Get {} None price".format(str(none_price_count)))
         return HttpResponseRedirect(reverse('shopee_spider:index'))
-    
 
     items = Item.objects.all()
-    
+
     context = {
         'items': items,
         'items_counts': len(items)
@@ -75,16 +74,38 @@ def index(request):
     return render(request, 'shopee/index.html', context)
 
 
-def item_abandoned(request, item_id):
+def show_followering_items(requests):
+    items = Item.objects.filter(following=True)
+    context = {
+        "items": items,
+    }
+    return render(requests, "shopee/index_with_filter.html", context)
+
+
+def show_abandoned_items(requests):
+    items = Item.objects.filter(abandoned=True)
+    context = {
+        "items": items,
+    }
+    return render(requests, "shopee/index_with_filter.html", context)
+    return
+
+
+# def show_eye_on_items(requests):
+#     return
+
+
+# actions
+def make_item_abandoned(request, item_id):
     item = Item.objects.get(id=item_id)
-    item.abandoned = True
+    item.abandoned = not item.abandoned
     item.save()
     return HttpResponseRedirect(reverse('shopee_spider:index'))
 
 
-def item_following(request, item_id):
+def make_item_following(request, item_id):
     item = Item.objects.get(id=item_id)
-    item.following = True
+    item.following = not item.following
     item.save()
     return HttpResponseRedirect(reverse('shopee_spider:index'))
 
@@ -92,7 +113,6 @@ def item_following(request, item_id):
 def following_list(request):
     return
 
+
 def abandoned_list(request):
     return
-    
-

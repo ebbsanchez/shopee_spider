@@ -7,52 +7,20 @@
 {% block content %}
 <br>
 <br>	
-	<div class="actions container">
-		<form action="" method="POST">
-			{% csrf_token %}
-			<input id="search_text" type="text" placeholder="Search Some Item.">
-			<input class="btn yellow lighten-3 black-text" type="submit" value="搜尋 Marshall 資料">	
-		</form>
-		
-	</div>
 	<div class="container overwrite">
-
-		{# NEW ITEM BLOCK #}
-		{% if new_items %}
-			<h1>new_items</h1>
-		{% endif %}
-		<ol>
-			{% for item in new_items %}
-				{# {% if not item.abandoned %} #}
-					<li class="">
-						<div>
-							<img class="item-image" src="https://cf.shopee.tw/file/{{ item.image }}" alt="item image"><br>
-							{ item.name }}
-							<br>
-							{{ item.price }}
-						</div>
-					</li>
-					<br>
-				{# {% endif %} #}
-			{% endfor %}
-		</ol>
-		<br>
-		{# NEW ITEM BLOCK END#}
-
-		{# OLD ITEM BLOCK #}
-
+		
 		{# INFO DESK #}
 		<div class="info-desk">
 			<button class="trigger-action btn">用來批量處理的按鈕</button>
 
 			<div><strong>items counts:</strong> {{ items_counts }} items in DB	</div>
 		</div>
+		{# INFO DESK END #}
 		
-		
-		{# Cards #}
-		<div class="row">
+		{# OLD ITEM BLOCK #} {# Cards #}
+		<div class="row">  {# ROW #}
 		{% for item in items %}
-			{% if not item.abandoned %}
+			
 				<div class="col s12 m4">
 					<div class="card overwrite {% if item.abandoned %}abandoned{% endif %} {% if item.following %} following{% endif %} {% if item.updated %}updated{% endif %}">
 						<div class="card-image">
@@ -87,10 +55,9 @@
 						</div>
 					</div>
 				</div>
-			{% endif %}
 		{% endfor %}
-	</div>
-	{# OLD ITEM BLOCK END#}
+	</div> {# ROW END#}
+	{# OLD ITEM BLOCK END#} {# CARDS END #}
 
 </div>
 <script>

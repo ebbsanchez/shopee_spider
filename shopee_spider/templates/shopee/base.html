@@ -22,6 +22,16 @@
 
 </head>
 <body class="lime lighten-5">
+      <nav>
+        <div class="nav-wrapper">
+          <a href="#" class="brand-logo right">Logo</a>
+          <ul id="nav-mobile" class="left hide-on-med-and-down">
+            <li><a href="{% url 'shopee_spider:index'%}">INDEX</a></li>
+            <li><a href="{% url 'shopee_spider:following_items'%}">FOLLOWING</a></li>
+            <li><a href="{% url 'shopee_spider:abandoned_items'%}">ABANDONED</a></li>
+          </ul>
+        </div>
+      </nav>
     {% block content %}  
     {% endblock content %}
 </body>

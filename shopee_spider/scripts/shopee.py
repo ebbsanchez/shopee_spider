@@ -24,7 +24,7 @@ def getHeaders():
     driver.close()
     headers = {
         'cookie': cookie,
-        'referer': 'https://shopee.tw/search?keyword=marshall',
+        'referer': '',
         'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.106 Safari/537.36',
         "Accept": "application/json",
         "Content-Type": "application/json",
@@ -32,10 +32,10 @@ def getHeaders():
     return headers
 
 
-def getitems():
+def getitems(keyword='marshall stockwell'):
     # TODO: Get all items
-    keyword = urllib.parse.quote('marshall stockwell')
-    headers = getHeaders()
+    headers = getHeaders(keyword)
+    keyword = urllib.parse.quote(keyword)
     headers['referer'] = 'https://shopee.tw/search?keyword={}'.format(keyword)
     all_items = []
     total_count = 0
