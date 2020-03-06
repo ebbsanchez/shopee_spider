@@ -64,25 +64,30 @@ class shopeeSpider:
         return from_item + 50 > total_count or from_item + 50 > limit
 
     def get_formated_item_dict(self, item, keyword):
-        formated_item_dict = {
-            'itemid': item['itemid'],
-            'shopid': item['shopid'],
-            'name': item['name'],
-            'item_status': item['item_status'],
-            'image': item['image'],
-            'images': item['images'],
-            'brand': item['brand'],
-            'liked_count': item['liked_count'],
-            'view_count': item['view_count'],
-            'stock': item['stock'],
-            'price': self.formated_price(item['price']),
-            'price_min': self.formated_price(item['price_min']),
-            'price_max': self.formated_price(item['price_max']),
-            'currency': item['currency'],
-            'url': self.make_item_url(
-                item['name'], item['shopid'], item['itemid']),
-            'tag_name': keyword
-        }
+        try:
+            formated_item_dict = {
+                'itemid': item['itemid'],
+                'shopid': item['shopid'],
+                'name': item['name'],
+                'item_status': item['item_status'],
+                'image': item['image'],
+                'images': item['images'],
+                'brand': item['brand'],
+                'liked_count': item['liked_count'],
+                'view_count': item['view_count'],
+                'stock': item['stock'],
+                'price': self.formated_price(item['price']),
+                'price_min': self.formated_price(item['price_min']),
+                'price_max': self.formated_price(item['price_max']),
+                'currency': item['currency'],
+                'url': self.make_item_url(
+                    item['name'], item['shopid'], item['itemid']),
+                'tag_name': keyword
+            }
+        except TypeError as e:
+            print(e)
+            print("Item Price is {}, is it None?".format(item['price']))
+            raise TypeError
         return formated_item_dict
 
     def item_price_any_none(self, url, test_keyword="Marshall"):

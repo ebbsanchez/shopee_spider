@@ -10,7 +10,7 @@
 	<div class="actions container">
 		<form action="" method="POST">
 			{% csrf_token %}
-			<input id="search_text" type="text" placeholder="Search Some Item.">
+			<input id="search_keyword" name="search_keyword" type="text" placeholder="Search Some Item." required>
 			<input class="btn yellow lighten-3 black-text" type="submit" value="搜尋 Marshall 資料">	
 		</form>
 		

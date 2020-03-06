@@ -1,0 +1,15 @@
+{% extends "shopee/base.html" %}
+
+{% block content %}
+	 
+	<div class="actions container">
+		test
+			<form action="" method="POST" name="search_form" onsubmit="return validateForm()">
+				{% csrf_token %}
+				<input id="search_keyword" name="search_keyword" type="text" placeholder="Search Some Item." >
+				<input class="btn yellow lighten-3 black-text" type="submit" value="搜尋">	
+			</form>
+	</div>
+	{{ post_data }}
+
+{% endblock content %}
