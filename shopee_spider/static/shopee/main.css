@@ -1,4 +1,9 @@
-/* variable */
+/*Control Panel*/
+#information-panel {
+	padding: 1em;
+}
+
+
 
 .abandoned {
 	/*display: none;*/
@@ -39,6 +44,7 @@ img.item-image {
 	padding: 1em;
 	text-align: center;
 }
+
 
 @media only screen and (min-width: 993px){
 	.container.overwrite {

@@ -7,14 +7,49 @@
 {% block content %}
 <br>
 <br>	
-	<div class="actions container">
-		<form action="" method="POST">
-			{% csrf_token %}
-			<input id="search_keyword" name="search_keyword" type="text" placeholder="Search Some Item." required>
-			<input class="btn yellow lighten-3 black-text" type="submit" value="搜尋 Marshall 資料">	
-		</form>
-		
-	</div>
+	<main id="control-panel" class="container">
+	{# Searching #}
+		<div class="actions">
+			<form action="" method="POST">
+				{% csrf_token %}
+				<input id="search_keyword" name="search_keyword" type="text" placeholder="Search Some Item." required>
+				<input class="btn yellow lighten-3 black-text" type="submit" value="搜尋 Marshall 資料">	
+			</form>
+			
+		</div>
+		{# Searching End#}
+		<br>
+
+	{# Searching History #}
+		<div class="center">
+			{# {% for tag in tags %} #}
+				<button class="btn">Marshall</button>
+				<button class="btn">Bose</button>
+				<button class="btn">JBL</button>
+			{# {% endfor %} #}
+		</div>
+		<br>
+		{# Searching History End #}
+
+	{# Information Panel #}
+		<div id="information-panel" class="">
+			<p class="split-button center">
+				<span class="btn-large disabled">有 ?? 筆新商品上架了</span>    <span class=" pink btn-large">有 ?? 筆商品下架</span></p>
+			
+			<br>
+			
+			<p>目前追蹤中的關鍵字有： ？？？ ？？？ ？？？ ？？？</p>
+			<p>最後全部更新時間</p>
+
+		</div>
+		{# Information Panel End#}
+	</main>
+	
+
+	<br>
+	<div class="divider"></div>
+
+	
 	<div class="container overwrite">
 
 		{# NEW ITEM BLOCK #}
@@ -42,9 +77,11 @@
 		{# OLD ITEM BLOCK #}
 
 		{# INFO DESK #}
-		<div class="info-desk">
-			<button class="trigger-action btn">用來批量處理的按鈕</button>
+		<h3>最新更新</h3>
 
+
+		<h3>所有物件</h3>
+		<div class="info-desk">
 			<div><strong>items counts:</strong> {{ items_counts }} items in DB	</div>
 		</div>
 		
