@@ -3,6 +3,8 @@ import urllib.parse
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import logging
+from proxy_collector import ProxyCollector
+import random
 
 
 def r(nameOfModule):
@@ -13,17 +15,21 @@ def r(nameOfModule):
 
 class shopeeSpider:
     def __init__(self, saving=False):
+        self.keyword = ""
         self.headers = None
         self.using_proxy = False
         self.proxy_in_use = ""
+        self.proxyman = ProxyCollector(filename='proxies')
 
     # Main Method.
     def search(self, keyword, limit=9999):
+        self.keyword = keyword
         self.headers = self.structured_headers_and_keywords(keyword)
 
         raw_items = []
         total_count = 0
         from_item = 0
+
 
         # Fetch Items
         while True:
@@ -47,26 +53,48 @@ class shopeeSpider:
 
     def fetch_items(self, keyword="marshall stockwell", newest=0, limit=9999, proxy=None):
 
+        headers = self.headers or self.structured_headers_and_keywords(keyword)
+
         formatted_link = 'https://shopee.tw/api/v2/search_items/?by=relevancy&keyword={keyword}&limit=50&newest={newest}&order=desc&page_type=search&version=2'.format(
             keyword=keyword,
             newest=newest
         )
-        req = requests.get(formatted_link, headers=self.headers)
-        response = req.json()
-        items = response['items']
 
-        - Worling on here!! - 
+        if proxy != None:
+            proxy = self.format_proxy_with_http(proxy)
+            proxy = {
+                'http': proxy,
+                'https': proxy,
+            }
+
+        try:
+            req = requests.get(formatted_link, headers=self.headers, proxies=proxy, timeout=10) 
+            response = req.json()
+            items = response['items']
+            logging.debug("req: {}".format(req))
+            logging.debug('response: {}'.format(response))
+            logging.debug('items: {}'.format(items))
+        except (requests.exceptions.ProxyError, requests.exceptions.ConnectTimeout) as e:
+            logging.debug(e)
+            logging.info(' {} proxy not working...'.format(proxy))
+            items = None
+
+
+        # - Worling on here!! - 
         if self.test_if_get_blocked(items):
-            proxy = self.get_alive_proxy(url=formated_link, limit=1)
-            items, total_count = self.fetch_items()
+            logging.debug("[X] Get blocked.. try to get some proxy.")
+            proxies = self.proxyman.return_shopee_proofed_proxies(limit=10)
+            proxy = random.choice(proxies)
+            logging.debug("[fetch_items] let's try with {}".format(proxy))
+            items, total_count = self.fetch_items(proxy=proxy)
         else:
             total_count = response['total_count']
         
 
 
         total_count = response['total_count']
-        - Worling on here!! - 
-        
+        # - Worling on here!! - 
+
         print("[fetch_items()] <{}> {}/{} items".format(
             str(req.status_code),
             str(newest + len(items)),
@@ -77,13 +105,22 @@ class shopeeSpider:
         return from_item + 50 > total_count or from_item + 50 > limit
 
     def test_if_get_blocked(self, items):
+        if items == None:
+            return True    
         for item in items:
             if item['price'] == None:
                 return True
+
         return False
 
-    def get_one_alive_proxy(url):
-        pass
+
+    def format_proxy_with_http(self, proxy):
+        logging.debug("proxy= {}".format(proxy))
+
+        if proxy.startswith('http://'):
+            return proxy
+        else:
+            return "http://{}".format(proxy)
 
 
     def get_formated_item_dict(self, item, keyword):
@@ -117,7 +154,7 @@ class shopeeSpider:
         chrome_options.add_argument('--disable-gpu')
 
         # driver requests, get cookie and csrf-token
-        driver = webdriver.Chrome(chrome_options=chrome_options)
+        driver = webdriver.Chrome(options=chrome_options)
         driver.get('https://shopee.tw/')
         cookie, csrftoken = self.get_cookie_and_csrftoken(driver)
         driver.close()
@@ -147,6 +184,7 @@ class shopeeSpider:
         return cookie, csrftoken
 
     def structured_headers_and_keywords(self, keyword=None):
+        logging.debug("No Headers. get some headers.")
         headers = self.getHeaders()
         keyword = keyword or "marshall stockwell"
         urllib.parse.quote(keyword)
@@ -199,5 +237,7 @@ def testHeader(headers, keyword):
     prices = [i['price'] for i in items]
     return prices
 
-# headers['']
-# testHeader(headers,keyword)
+if __name__ == '__main__':
+    logging.basicConfig(level=logging.DEBUG)
+    s = shopeeSpider()
+    s.fetch_items(limit=1)

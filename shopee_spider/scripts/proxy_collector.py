@@ -8,6 +8,11 @@ import multiprocessing as mp
 import re
 import random
 
+import urllib.parse
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+
+
 class ProxyCollector:
     def __init__(self, filename, dont_init=False, timeout=10):
         self.filename = 'datasets/{}.csv'.format(filename)
@@ -16,6 +21,10 @@ class ProxyCollector:
         self.proxies_df = pd.DataFrame(columns=self.columns)
         self.proxies_on_call = []
         self.timeout = timeout
+        
+        # for shopee testing
+        self.headers = None
+        self.keyword = None
 
         if not dont_init:
             self.init_df()
@@ -187,6 +196,7 @@ class ProxyCollector:
             logging.debug(
                 " Add proxy but NOT SAVING to {}.".format(self.filename))
 
+    # User Helper
     def print_proxy_in_file(self):
         try:
             with open(self.filename, 'rb') as f:
@@ -216,8 +226,7 @@ class ProxyCollector:
             result_df = self.proxies_df.loc[self.proxies_df['status'] == "alive"]
 
         if status_for_projects != "":
-            result_df = result_df.loc[result_df["status_for_projects"]
-                                      == status_for_projects]
+            result_df = result_df.loc[result_df["status_for_projects"] == status_for_projects]
 
         result_series = result_df.sample(n=limit)['ip:port']
         result_list = result_series.to_list()
@@ -246,12 +255,162 @@ class ProxyCollector:
         else:
             return False
     
-    def return_url_proofed_proxy(self, url):
-        pass
 
+    
+    def return_shopee_proofed_proxies(self, keyword="Marshall", limit=10):
+
+
+        self.keyword = keyword
+        self.headers = self.structured_headers_and_keywords()
+
+
+        logging.debug("Start testing proxies async for shopee")
+        
+        shopee_proofed_proxy = []
+        alive_proxies = []
+        count = 0
+
+        for index, proxy in self.proxies_df.iterrows():
+            # if proxy['status'] == 'alive':
+            alive_proxies.append(proxy['ip:port'])
+
+
+        for small_list in self.listsep_gen(alive_proxies, limit=8):
+            status_and_proxy = self.testing_proxy_with_shopee_async(small_list)
+
+            for status, proxy in status_and_proxy:
+                count += 1
+                logging.info("[{}]{}: {}".format(count, proxy, status))
+                if status == True:
+                    self.add_proxy(proxy, status="alive" ,status_for_projects="alive")
+                    shopee_proofed_proxy.append(proxy)
+                if len(shopee_proofed_proxy) >= limit:
+                    return shopee_proofed_proxy
+        return shopee_proofed_proxy
+
+
+
+    def testing_proxy_with_shopee_async(self, proxies, processes=mp.cpu_count()):
+        logging.debug("Start testing proxies async for shopee")
+        status_and_proxy = []
+
+        p = mp.Pool(processes=processes)
+        result = p.map(self.check_proxy_alive_with_shopee, proxies)
+        p.close()
+        p.join()
+        
+        for index, status in enumerate(result):
+            status_and_proxy.append((status, proxies[index]))
+
+        return status_and_proxy
+
+    def check_proxy_alive_with_shopee(self, proxy, timeout=None):
+        logging.debug("Testing {}...".format(proxy))
+
+        timeout = timeout or self.timeout
+
+        try:
+
+            prices = self.get_shopee_prices(proxy)
+
+            if all(prices):
+                logging.info(' Proxy worked. {}'.format(prices))
+                return True
+            else:
+                raise requests.exceptions.ProxyError
+            
+        except (requests.exceptions.ProxyError, requests.exceptions.ConnectTimeout, requests.exceptions.ReadTimeout) as e:
+            logging.debug(e)
+            logging.info(' {} proxy not working...'.format(proxy))
+            return False
+        except requests.exceptions.ConnectionError as e:
+            logging.debug(e)
+            logging.info("ConnectionError, skip this proxy.")
+            return False
+        except requests.exceptions.InvalidProxyURL as e:
+            logging.debug(e)
+            logging.info("Not a valid proxy url. Assume is the end of file.")
+            return False
+    
+    
+    def get_shopee_prices(self, proxy=None):
+        if proxy == None:
+            pass
+        else:
+            proxy = self.format_proxy_with_http(proxy)
+            proxy = {
+                'http': proxy,
+                'https': proxy,
+            }
+
+        prices = []
+        test_link = 'https://shopee.tw/api/v2/search_items/?by=relevancy&keyword={keyword}&limit=50&newest={newest}&order=desc&page_type=search&version=2'.format(
+            keyword=self.keyword,
+            newest=0
+        )
+
+        req = requests.get(test_link,
+                           headers=self.headers,
+                           proxies=proxy,
+                           timeout=self.timeout)
+
+        response = req.json()
+        items = response['items']
+        for item in items:
+            prices.append(item['price'])
+
+        return prices
+
+
+
+    def structured_headers_and_keywords(self):
+        headers = self.getHeaders()
+        keyword = self.keyword
+        keyword = urllib.parse.quote(keyword)
+        headers['referer'] = 'https://shopee.tw/search?keyword={}'.format(
+            keyword)
+        return headers
+
+    def getHeaders(self):
+        logging.debug("Execute getHeaders()")
+
+        # Headless
+        chrome_options = Options()
+        chrome_options.add_argument('--headless')
+        chrome_options.add_argument('--disable-gpu')
+
+        # driver requests, get cookie and csrf-token
+        driver = webdriver.Chrome(options=chrome_options)
+        driver.get('https://shopee.tw/')
+        cookie, csrftoken = self.get_cookie_and_csrftoken(driver)
+        driver.close()
+
+        # strctured headers
+        headers = {
+            'cookie': cookie,
+            'referer': '',  # apply in getitems()
+            'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.106 Safari/537.36',
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+        }
+
+        return headers
+
+    def get_cookie_and_csrftoken(self, driver):
+        cookie = '; '.join(['{}={}'.format(item.get('name'), item.get(
+            'value')) for item in driver.get_cookies()])
+        csrftoken = ""
+
+        for item in driver.get_cookies():
+            if item.get('name') == 'csrftoken':
+                csrftoken = item.get('value')
+
+        if csrftoken == "":
+            logging.warning("Not getting CSRF token.")
+        return cookie, csrftoken
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=logging.DEBUG)
     proxyman = ProxyCollector(filename='proxies')
     # print('IP: {}'.format(proxyman.get_my_ip()))
     # proxyman.print_proxy_in_file()
@@ -261,5 +420,5 @@ if __name__ == '__main__':
         "https://raw.githubusercontent.com/x-o-r-r-o/proxy-list/master/proxy-list.txt",
         "https://raw.githubusercontent.com/a2u/free-proxy-list/master/free-proxy-list.txt",
     ]
-
-    result = proxyman.collect_raw_proxies_async(random.choice(raw_proxy_list))
+    l = proxyman.return_shopee_proofed_proxies()
+    # result = proxyman.collect_raw_proxies_async(random.choice(raw_proxy_list))

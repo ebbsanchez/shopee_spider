@@ -1,3 +1,12 @@
+
+TODO: 03/11
+1:DEBUG:root:response: {'show_disclaimer': None, 'query_rewrite': None, 'adjust': None, 'version': 'b1c94828d525e526ff969f451cc3ac33', 'algorithm': None, 'total_count': None, 'error': None, 'total_ads_count': None, 'nomore': None, 'price_adjust': None, 'json_data': None, 'suggestion_algorithm': None, 'items': None, 'reserved_keyword': None, 'hint_keywords': None}
+
+2:DEBUG:root:No Headers. get some headers.
+
+
+shopee_proofed_proxies = ['202.5.56.71:8080', '118.137.146.95:8080', '51.158.114.177:8811', '36.92.35.73:3128', '180.189.168.66:3129', '103.76.45.142:8080', '51.158.123.250:8811', '41.180.64.254:80', '110.78.20.62:3128', '165.16.34.2:8080']
+
 "{}/{}-{}.{}.{}".format('https://shopee.tw',new_items[0]['name'].replace(' ','-'),'i',new_items[0]['shopid'], new_items[0]['itemid'])
 
 SHELL:
