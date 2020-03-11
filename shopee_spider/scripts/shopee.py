@@ -14,9 +14,11 @@ def r(nameOfModule):
 class shopeeSpider:
     def __init__(self, saving=False):
         self.headers = None
+        self.using_proxy = False
+        self.proxy_in_use = ""
 
     # Main Method.
-    def search(self, keyword, limit=9999, proxy=None):
+    def search(self, keyword, limit=9999):
         self.headers = self.structured_headers_and_keywords(keyword)
 
         raw_items = []
@@ -43,7 +45,7 @@ class shopeeSpider:
             )
         return formated_items
 
-    def fetch_items(self, keyword="marshall stockwell", newest=0, limit=9999):
+    def fetch_items(self, keyword="marshall stockwell", newest=0, limit=9999, proxy=None):
 
         formatted_link = 'https://shopee.tw/api/v2/search_items/?by=relevancy&keyword={keyword}&limit=50&newest={newest}&order=desc&page_type=search&version=2'.format(
             keyword=keyword,
@@ -53,7 +55,18 @@ class shopeeSpider:
         response = req.json()
         items = response['items']
 
+        - Worling on here!! - 
+        if self.test_if_get_blocked(items):
+            proxy = self.get_alive_proxy(url=formated_link, limit=1)
+            items, total_count = self.fetch_items()
+        else:
+            total_count = response['total_count']
+        
+
+
         total_count = response['total_count']
+        - Worling on here!! - 
+        
         print("[fetch_items()] <{}> {}/{} items".format(
             str(req.status_code),
             str(newest + len(items)),
@@ -62,6 +75,16 @@ class shopeeSpider:
 
     def already_fetehed_all(self, from_item, total_count, limit):
         return from_item + 50 > total_count or from_item + 50 > limit
+
+    def test_if_get_blocked(self, items):
+        for item in items:
+            if item['price'] == None:
+                return True
+        return False
+
+    def get_one_alive_proxy(url):
+        pass
+
 
     def get_formated_item_dict(self, item, keyword):
         formated_item_dict = {
@@ -84,13 +107,6 @@ class shopeeSpider:
             'tag_name': keyword
         }
         return formated_item_dict
-
-    def item_price_any_none(self, url, test_keyword="Marshall"):
-        # TODO
-        if True:
-            return True
-        else:
-            return False
 
     def getHeaders(self):
         logging.debug("Execute getHeaders()")
@@ -160,10 +176,15 @@ class shopeeSpider:
         pass
 
     # Testing
-    def test_getItems(self):
-        pass
+    def test_search_items(self, keyword="Marshall"):
+        formated_items = self.search(keyword, limit=1)
+        assert len(formated_items) == 50
+        assert type(formated_items[0]['itemid']) == int
+        assert type(formated_items[0]['shopid']) == int
+        print("[test_search_items] All test pass. return sample item. (formated_items[0])")
+        return formated_items[0]
 
-    def test_getHeaders(self):
+    def get_alive_proxy(self):        
         pass
 
 
