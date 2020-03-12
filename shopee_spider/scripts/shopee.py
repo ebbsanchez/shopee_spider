@@ -3,7 +3,7 @@ import urllib.parse
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import logging
-from proxy_collector import ProxyCollector
+from .proxy_collector import ProxyCollector
 import random
 
 
