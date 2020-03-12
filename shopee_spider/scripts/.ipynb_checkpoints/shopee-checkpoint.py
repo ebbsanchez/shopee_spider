@@ -20,7 +20,6 @@ class shopeeSpider:
         self.using_proxy = False
         self.proxy_in_use = ""
         self.proxyman = ProxyCollector(filename='proxies')
-        self.skip_own_ip_one_time = False
 
     # Main Method.
     def search(self, keyword, limit=9999):
@@ -55,9 +54,6 @@ class shopeeSpider:
     def fetch_items(self, keyword="marshall stockwell", newest=0, limit=9999, proxy=None):
 
         headers = self.headers or self.structured_headers_and_keywords(keyword)
-        self.headers = headers
-
-        assert headers['referer'].split('=')[1] == keyword
 
         formatted_link = 'https://shopee.tw/api/v2/search_items/?by=relevancy&keyword={keyword}&limit=50&newest={newest}&order=desc&page_type=search&version=2'.format(
             keyword=keyword,
@@ -77,7 +73,7 @@ class shopeeSpider:
             items = response['items']
             logging.debug("req: {}".format(req))
             logging.debug('response: {}'.format(response))
-            logging.debug('items[0]: {}'.format(items[0]))
+            logging.debug('items: {}'.format(items))
         except (requests.exceptions.ProxyError, requests.exceptions.ConnectTimeout) as e:
             logging.debug(e)
             logging.info(' {} proxy not working...'.format(proxy))
@@ -85,11 +81,9 @@ class shopeeSpider:
 
 
         # - Worling on here!! - 
-        
-        if self.test_if_get_blocked(items) or self.skip_own_ip_one_time:
-            self.skip_own_ip_one_time = False
+        if self.test_if_get_blocked(items):
             logging.debug("[X] Get blocked.. try to get some proxy.")
-            proxies = self.proxyman.return_shopee_proofed_proxies(limit=2)
+            proxies = self.proxyman.return_shopee_proofed_proxies(limit=10)
             proxy = random.choice(proxies)
             logging.debug("[fetch_items] let's try with {}".format(proxy))
             items, total_count = self.fetch_items(proxy=proxy)
@@ -246,4 +240,4 @@ def testHeader(headers, keyword):
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
     s = shopeeSpider()
-    print(s.fetch_items(limit=1))
+    s.fetch_items(limit=1)

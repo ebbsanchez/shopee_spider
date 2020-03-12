@@ -270,16 +270,12 @@ class ProxyCollector:
         alive_proxies = []
         count = 0
 
-
         for index, proxy in self.proxies_df.iterrows():
             # if proxy['status'] == 'alive':
             alive_proxies.append(proxy['ip:port'])
 
-        suffled_alive_proxies = alive_proxies
-        random.shuffle(suffled_alive_proxies)
 
-
-        for small_list in self.listsep_gen(suffled_alive_proxies, limit=8):
+        for small_list in self.listsep_gen(alive_proxies, limit=8):
             status_and_proxy = self.testing_proxy_with_shopee_async(small_list)
 
             for status, proxy in status_and_proxy:
